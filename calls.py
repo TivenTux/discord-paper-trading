@@ -7,9 +7,9 @@ from pycoingecko import CoinGeckoAPI
 cg = CoinGeckoAPI()
 
 #discord_bot_token
-discord_token = 'xxxxxxxxx'
-intents = discord.Intents().all()
-client = discord.Client(prefix='', intents=intents)
+discord_token = 'xxxxxxxx'
+
+client = discord.Client(prefix='', intents=discord.Intents().all())
 
 #daily usd bonus for each player. 1 to enable 2 to disable
 daily_usd_claim = 1
@@ -31,6 +31,8 @@ database = './calls.db'
 #not used anymore - cryptocompare api - replaced by gecko and tv
 crypto_compare_token = 'xxxx'
 
+### conf end
+###
 #refreshing coins list
 dump1 = cg.get_coins_list()
 print('caching coins list')
@@ -70,10 +72,6 @@ async def tradingview_price(ticker):
         browser = await launch(executablePath=chrome_exec_dir, headless=True, args= chrome_exec_args)
         page = await browser.newPage()   
         charturl = tvbase + ticker
-#        css_load = 'span.tv-market-status__label'
-        # css_load = 'div.statusItem-1gsKvHgg:nth-child(2)'
-        # css_vertical = '#widget-container > div.js-rootresizer__contents > div.layout__area--center.no-border-bottom-left-radius.no-border-bottom-right-radius > div > div.chart-container-border > div > table > tr:nth-child(1) > td:nth-child(3) > div > canvas:nth-child(2)'
-        # css_o = 'div.valueValue-3kA0oJs5'
         #get up to date selectors
         css_vol = tv_css_vol
         css_close = tv_css_closeprice
@@ -120,8 +118,6 @@ async def tradingview_price(ticker):
     except Exception as e: 
         print(e)
         await browser.close()
-        # ticker = ticker + 'btc'
-        # print('Error -> btc')
     return str(result), str(resultchange) 
 
 #create db connection
@@ -198,15 +194,19 @@ def get_vantage(ticker, vantage_api_step):
     response = requests.get(url)
     json_data2 = json.loads(response.text)
     quote = json_data2['Global Quote']['05. price']
-    return str(quote)    
+    return str(quote)  
 
-async def update_gain_losses(userid, n, channel, scorewin, scoreloss, score1):
+###
+###call, callpo, callpc, calldo, calldc, callpos ====> ticker, call_price_open, call_price_close, calldateopen, calldateclose, callposition
+###
+
+async def update_gain_losses(userid, n_instruction, channel, scorewin, scoreloss, score1):
     #updates real gain and losses score
     #on delete and close
     conn = create_connection(database)
     serverds = time.strftime('%D')
-    n = 'ratioupdate'
-    if n == 'ratioupdate':
+    n_instruction = 'ratioupdate'
+    if n_instruction == 'ratioupdate':
         try:
             with conn:
                 cur = conn.cursor()
@@ -224,7 +224,7 @@ async def update_gain_losses(userid, n, channel, scorewin, scoreloss, score1):
         return str('error')
     return str('updated')   
 
-async def nameupdate(userid, n, channel, usern):
+async def nameupdate(userid, n_instruction, channel, usern):
     #updates user name
     #on every loadfield
     conn = create_connection(database)
@@ -239,13 +239,13 @@ async def nameupdate(userid, n, channel, usern):
         print(e)
     return str('updatedname')     
 
-async def money_update(userid, n, channel, score2):
+async def money_update(userid, n_instruction, channel, score2):
     #updates user's money
     #on delete and close
     conn = create_connection(database)
     serverds = time.strftime('%D')
-    n = 'ratioupdate'
-    if n == 'ratioupdate':
+    n_instruction = 'ratioupdate'
+    if n_instruction == 'ratioupdate':
         try:
             with conn:
                 cur = conn.cursor()
@@ -259,8 +259,8 @@ async def money_update(userid, n, channel, score2):
         return str('error')
     return str('updated')  
 
-async def remember_money(userid, n, channel, money, multiplier):
-    #remembers money amount when the position is opened
+async def remember_money(userid, n_instruction, channel, money, multiplier):
+    #remembers money amount when each position is opened
     conn = create_connection(database)
     serverds = time.strftime('%D')
     try:
@@ -286,7 +286,7 @@ async def remember_money(userid, n, channel, money, multiplier):
         print(e)
     return str('updated')  
 
-async def load_data(userid, n, channel, orderby):
+async def load_data(userid, n_instruction, channel, orderby):
     #loads data for users from db
     #also used to check for registered users and existing data
     userstatus = 0
@@ -330,12 +330,12 @@ async def load_data(userid, n, channel, orderby):
         print(e)
     return
 
-async def update_field2delete(userid, n, channel, tw, tl):
+async def update_field2delete(userid, n_instruction, channel, tw, tl):
     #updates specific position when called
     #usually on closing position
     conn = create_connection(database)
     serverds = time.strftime('%D')
-    if n == 'ratioupdate':
+    if n_instruction == 'ratioupdate':
         try:
             with conn:
                 cur = conn.cursor()
@@ -369,12 +369,12 @@ def create_entry(conn, entry):
     print(cur.lastrowid)
     return cur.lastrowid
 
-async def update_tether(userid, n, channel, score2):
+async def update_tether(userid, n_instruction, channel, score2):
     # updates total USD tether credits and last requested gibs day
     conn = create_connection(database)
     serverds = time.strftime('%D')
     lastgibs = serverds
-    if n == 'gibs':
+    if n_instruction == 'gibs':
         try:
             with conn:
                 cur = conn.cursor()
@@ -393,8 +393,8 @@ async def update_tether(userid, n, channel, score2):
         return str('errorgibs')
     return str('updatedgibs')    
 
-async def update_field2(userid, callpc, calldc, n, multiplier, channel, score3, score2, tw, tl, inform):
-    #updates specific position when called
+async def update_field2(userid, callpc, calldc, n_instruction, multiplier, channel, score3, score2, tw, tl, inform):
+    #updates specific position or multiplier when called
     #usually on closing position
     conn = create_connection(database)
     serverds = time.strftime('%D')
@@ -508,12 +508,12 @@ async def update_field2(userid, callpc, calldc, n, multiplier, channel, score3, 
     else:
         print('i give up')                      
         return str('error')
-    if n == 'delete':
+    if n_instruction == 'delete':
         return str('deleted')
     return str('updated')    
 
 #new user initiator
-def create_entryinitiate(conn, entry, userid, n):
+def create_entryinitiate(conn, entry, userid, n_instruction):
     #initiates/registers user that cant be found in db
     """
     Create a new entry into the entries table
@@ -553,7 +553,6 @@ async def send_message2(userid, channel, msg, inform):
         msg6 = await channel.send(embed=embed)
         await asyncio.sleep(23)
         await msg6.delete() 
-        #embed.set_footer(text='footertxt')
     elif msg == 'closed':
         embed=discord.Embed(title="Success", url='')
         embed.set_author(name=" ", url="", icon_url="")
@@ -562,12 +561,12 @@ async def send_message2(userid, channel, msg, inform):
         msg6 = await channel.send(embed=embed)
         await asyncio.sleep(93)
         await msg6.delete() 
-        #embed.set_footer(text='footertxt')
     return
 
 async def send_message(userid, channel, msg):
     #handles different set of messages and alerts  
     serverds = time.strftime('%D')
+    #already closed slot msg
     if msg == 'alreadyclosed':
         embed=discord.Embed(title="Error", url='')
         embed.set_author(name=" ", url="", icon_url="")
@@ -575,7 +574,7 @@ async def send_message(userid, channel, msg):
         msg6 = await channel.send(embed=embed)
         await asyncio.sleep(23)
         await msg6.delete() 
-        #embed.set_footer(text='footertxt')
+    #closed position msg
     elif msg == 'closed':
         embed=discord.Embed(title="Success", url='')
         embed.set_author(name=" ", url="", icon_url="")
@@ -583,7 +582,7 @@ async def send_message(userid, channel, msg):
         msg6 = await channel.send(embed=embed)
         await asyncio.sleep(23)
         await msg6.delete() 
-        #embed.set_footer(text='footertxt')
+    #syntax error while indicating slot msg    
     elif msg == 'indicatorerror':
         embed=discord.Embed(title="Error", url='')
         embed.set_author(name=" ", url="", icon_url="")
@@ -591,6 +590,7 @@ async def send_message(userid, channel, msg):
         msg6 = await channel.send(embed=embed)
         await asyncio.sleep(23)
         await msg6.delete() 
+    #crypto/stock ticker error msg
     elif msg == 'noprice':
         embed=discord.Embed(title="Error", url='')
         embed.set_author(name=" ", url="", icon_url="")
@@ -598,6 +598,7 @@ async def send_message(userid, channel, msg):
         msg6 = await channel.send(embed=embed)
         await asyncio.sleep(23)
         await msg6.delete() 
+    #userid error msg
     elif msg == 'wronguser':
         embed=discord.Embed(title="Error", url='')
         embed.set_author(name=" ", url="", icon_url="")
@@ -605,6 +606,7 @@ async def send_message(userid, channel, msg):
         msg6 = await channel.send(embed=embed)
         await asyncio.sleep(23)
         await msg6.delete()     
+    #daily bonus given msg
     elif msg == 'gibsgiven':  
         embed=discord.Embed(title="Success", url='')
         embed.set_author(name=" ", url="", icon_url="")
@@ -612,6 +614,7 @@ async def send_message(userid, channel, msg):
         msg6 = await channel.send(embed=embed)
         await asyncio.sleep(23)
         await msg6.delete()   
+    #daily bonus already claimed msg
     elif msg == 'gibs2':  
         embed=discord.Embed(title="Error", url='')
         embed.set_author(name=" ", url="", icon_url="")
@@ -621,8 +624,8 @@ async def send_message(userid, channel, msg):
         await msg6.delete()              
     return
     
-
-async def firsttimeuser(userid, channel, n):
+###call, callpo, callpc, calldo, calldc, callpos ====> ticker, call_price_open, call_price_close, calldateopen, calldateclose, callposition
+async def firsttimeuser(userid, channel, n_instruction):
     #initiates/registers user that cant be found in db
     #prepares data and passes it to initiator
     try:
@@ -664,22 +667,22 @@ async def firsttimeuser(userid, channel, n):
         with conn:
             print(userid)
             entry = (userid,call1,call1po,call1pc,call1do,call1dc,call2,call2po,call2pc,call2do,call2dc,call3,call3po,call3pc,call3do,call3dc,call4,call4po,call4pc,call4do,call4dc,call5,call5po,call5pc,call5do,call5dc,call1pos,call2pos,call3pos,call4pos,call5pos,score2);
-            entry_id = create_entryinitiate(conn, entry, userid, n)
+            entry_id = create_entryinitiate(conn, entry, userid, n_instruction)
             print('made user')
-            if n != 'call':
-                await load_field(userid, n, channel)
-            if n == 'call':
+            if n_instruction != 'call':
+                await load_field(userid, n_instruction, channel)
+            if n_instruction == 'call':
                 return 3
-            if n == 'gibs':
+            if n_instruction == 'gibs':
                 score2 = '250'
-                await update_tether(userid, n, channel, score2)
+                await update_tether(userid, n_instruction, channel, score2)
                 return 72
     except Exception as e: 
         print(e)
         print('exception 44 first initiation')
     return
 
-async def update_field(userid, call, callpo, callpc, calldo, calldc, callpos, n, multiplier, channel, inform):
+async def update_field(userid, call, callpo, callpc, calldo, calldc, callpos, n_instruction, multiplier, channel, inform):
     #updates specific position when called
     #usually on opening new positions
     conn = create_connection(database)
@@ -782,9 +785,8 @@ async def update_field(userid, call, callpo, callpc, calldo, calldc, callpos, n,
         except Exception as e: 
             print(e)
     else:
-        print('i give up')                      
         return str('error')
-    if n == 'delete':  
+    if n_instruction == 'delete':  
         if len(inform) < 2:
             asyncio.ensure_future(notification_handler(userid, channel, 'Success', 'Slot cleared.', '*view all commands with* **.calls help**'))
         else:
@@ -792,15 +794,15 @@ async def update_field(userid, call, callpo, callpc, calldo, calldc, callpos, n,
         return str('deleted')
     return str('updated')
 
-async def load_field(userid, n, channel):
+async def load_field(userid, n_instruction, channel):
     #loads data for users from db
     #also used to check for registered users and existing data
     userstatus = 0
     serverds = time.strftime('%D')
-    connection = sqlite3.connect('./calls.db')
+    connection = sqlite3.connect(database)
     cur = connection.cursor()
+    #find user's name with discord id
     usern2 = str((client.get_user(userid)).name)
-    print(usern2)
     try:
 
         rows = cur.execute(
@@ -810,11 +812,11 @@ async def load_field(userid, n, channel):
         print(rows)
         print(rows[0][0])
         try:
-            await nameupdate(userid, n, channel, usern2)
+            await nameupdate(userid, n_instruction, channel, usern2)
         except:
             print('user not found ignore')
         if rows[0][0] == userid:
-            print('userid found')
+            #print('userid found')
             userstatus = 1
             usern = rows[0][1]
             call1 = rows[0][2]
@@ -879,57 +881,55 @@ async def load_field(userid, n, channel):
                 scoreloss = '0'      
             if score1 == None:
                 score1 = '0'                                           
-            print(tw)
-            print(tl)
-            if n == 'get':
+
+            if n_instruction == 'get':
                 if userstatus == 1:
                     return call1, call1po, call1pc, call1do, call1dc, call1pos, call2, call2po, call2pc, call2do, call2dc, call2pos, call3, call3po, call3pc, call3do, call3dc, call3pos, call4, call4po, call4pc, call4do, call4dc, call4pos, call5, call5po, call5pc, call5do, call5dc, call5pos
-            if n == 'all2':
+            if n_instruction == 'all2':
                 if userstatus == 1:
                     print('found external user')
-            if n == 'gibs':
+            if n_instruction == 'gibs':
                 return score2, lastgibs
-            if n == 'close1f':
+            if n_instruction == 'close1f':
                 if userstatus == 1:
                     return call1, call1po, call1pc, call1do, call1dc, call1pos, score3, score2, tw, tl, scorewin, scoreloss, score1, money1
-            if n == 'close2f':
+            if n_instruction == 'close2f':
                 if userstatus == 1:
                     return call2, call2po, call2pc, call2do, call2dc, call2pos, score3, score2, tw, tl, scorewin, scoreloss, score1, money2
-            if n == 'close3f':
+            if n_instruction == 'close3f':
                 if userstatus == 1:
                     return call3, call3po, call3pc, call3do, call3dc, call3pos, score3, score2, tw, tl, scorewin, scoreloss, score1, money3
-            if n == 'close4f':
+            if n_instruction == 'close4f':
                 if userstatus == 1:
                     return call4, call4po, call4pc, call4do, call4dc, call4pos, score3, score2, tw, tl, scorewin, scoreloss, score1, money4
-            if n == 'close5f':
+            if n_instruction == 'close5f':
                 if userstatus == 1:
                     return call5, call5po, call5pc, call5do, call5dc, call5pos, score3, score2, tw, tl, scorewin, scoreloss, score1, money5                                                                        
     except Exception as e: 
         print(e)
-        print('user id not found, initiating')
-        if n == 'all2':
+        #print('user id not found, initiating')
+        if n_instruction == 'all2':
             print('wronguser')
             msg = 'wronguser'
             asyncio.ensure_future(send_message(userid, channel, msg))
             return str('wronguser')
 
     if userstatus == 1:
-        print('success')
-        print(serverds)
+        #print('success')
 
         if call1po != 'n':
             n1 = 1
             onestring = str(call1) + ' ' + str(call1pos) + '\n' + 'Entry: ' + str(call1po) + ' Date: ' + str(call1do) + '\n' + 'Exit: ' + str(call1pc) + ' Date: ' + str(call1dc)
             if call1pc != 'n':
                 onestring = str(call1) + ' ' + str(call1pos) + '\n' + 'Entry: ' + str(call1po) + ' Date: ' + str(call1do) + '\n' + 'Exit: ' + str(call1pc) + ' Date: ' + str(call1dc)
-                if n == 'close1':
+                if n_instruction == 'close1':
                     msg = 'alreadyclosed'
                     asyncio.ensure_future(send_message(userid, channel, msg))
                     print('already closed, returning 8')
                     return userstatus, str(8)
             else:
                 onestring = str(call1) + ' ' + str(call1pos) + '\n' + 'Entry: ' + str(call1po) + ' Date: ' + str(call1do) + '\n' + '*close trade with* **.close 1**' 
-                if n == 'close1':
+                if n_instruction == 'close1':
                     print('closing 1')
                     return userstatus, str(5)
         else: 
@@ -940,14 +940,14 @@ async def load_field(userid, n, channel):
             twostring = str(call2) + ' ' + str(call2pos) + '\n' + 'Entry: ' + str(call2po) + ' Date: ' + str(call2do) + '\n' + 'Exit: ' + str(call2pc) + ' Date: ' + str(call2dc)
             if call2pc != 'n':
                 twostring = str(call2) + ' ' + str(call2pos) + '\n' + 'Entry: ' + str(call2po) + ' Date: ' + str(call2do) + '\n' + 'Exit: ' + str(call2pc) + ' Date: ' + str(call2dc)
-                if n == 'close2':
+                if n_instruction == 'close2':
                     msg = 'alreadyclosed'
                     asyncio.ensure_future(send_message(userid, channel, msg))
                     print('already closed, returning 8')
                     return userstatus, str(8)            
             else:
                 twostring = str(call2) + ' ' + str(call2pos) + '\n' + 'Entry: ' + str(call2po) + ' Date: ' + str(call2do) + '\n' + '*close trade with* **.close 2**' 
-                if n == 'close2':
+                if n_instruction == 'close2':
                     print('closing 2')
                     return userstatus, str(5)        
         else: 
@@ -958,14 +958,14 @@ async def load_field(userid, n, channel):
             threestring = str(call3) + ' ' + str(call3pos) + '\n' + 'Entry: ' + str(call3po) + ' Date: ' + str(call3do) + '\n' + 'Exit: ' + str(call3pc) + ' Date: ' + str(call3dc)
             if call3pc != 'n':
                 threestring = str(call3) + ' ' + str(call3pos) + '\n' + 'Entry: ' + str(call3po) + ' Date: ' + str(call3do) + '\n' + 'Exit: ' + str(call3pc) + ' Date: ' + str(call3dc)
-                if n == 'close3':
+                if n_instruction == 'close3':
                     msg = 'alreadyclosed'
                     asyncio.ensure_future(send_message(userid, channel, msg))
                     print('already closed, returning 8')
                     return userstatus, str(8)            
             else:
                 threestring = str(call3) + ' ' + str(call3pos) + '\n' + 'Entry: ' + str(call3po) + ' Date: ' + str(call3do) + '\n' + '*close trade with* **.close 3**' 
-                if n == 'close3':
+                if n_instruction == 'close3':
                     print('closing 3')
                     return userstatus, str(5)        
         else: 
@@ -976,14 +976,14 @@ async def load_field(userid, n, channel):
             fourstring = str(call4) + ' ' + str(call4pos) + '\n' + 'Entry: ' + str(call4po) + ' Date: ' + str(call4do) + '\n' + 'Exit: ' + str(call4pc) + ' Date: ' + str(call4dc)
             if call4pc != 'n':
                 fourstring = str(call4) + ' ' + str(call4pos) + '\n' + 'Entry: ' + str(call4po) + ' Date: ' + str(call4do) + '\n' + 'Exit: ' + str(call4pc) + ' Date: ' + str(call4dc)
-                if n == 'close4':
+                if n_instruction == 'close4':
                     msg = 'alreadyclosed'
                     asyncio.ensure_future(send_message(userid, channel, msg))
                     print('already closed, returning 8')
                     return userstatus, str(8)            
             else:
                 fourstring = str(call4) + ' ' + str(call4pos) + '\n' + 'Entry: ' + str(call4po) + ' Date: ' + str(call4do) + '\n' + '*close trade with* **.close 4**' 
-                if n == 'close4':
+                if n_instruction == 'close4':
                     print('closing 4')
                     return userstatus, str(5)        
         else: 
@@ -994,14 +994,14 @@ async def load_field(userid, n, channel):
             fivestring = str(call5) + ' ' + str(call5pos) + '\n' + 'Entry: ' + str(call5po) + ' Date: ' + str(call5do) + '\n' + 'Exit: ' + str(call5pc) + ' Date: ' + str(call5dc)
             if call5pc != 'n':
                 fivestring = str(call5) + ' ' + str(call5pos) + '\n' + 'Entry: ' + str(call5po) + ' Date: ' + str(call5do) + '\n' + 'Exit: ' + str(call5pc) + ' Date: ' + str(call5dc)
-                if n == 'close5':
+                if n_instruction == 'close5':
                     msg = 'alreadyclosed'
                     asyncio.ensure_future(send_message(userid, channel, msg))
                     print('already closed, returning 8')
                     return userstatus, str(8)            
             else:
                 fivestring = str(call5) + ' ' + str(call5pos) + '\n' + 'Entry: ' + str(call5po) + ' Date: ' + str(call5do) + '\n' + '*close trade with* **.close 5**' 
-                if n == 'close5':
+                if n_instruction == 'close5':
                     print('closing 5')
                     return userstatus, str(5)        
         else: 
@@ -1013,38 +1013,38 @@ async def load_field(userid, n, channel):
             score2 = 0
         if score3 == None:
             score3 = 0
-
-        if n == 'all21' or n == 'all22' or n == 'all23' or n == 'all24' or n == 'all25':
+        #close pos before deleting
+        if n_instruction == 'all21' or n_instruction == 'all22' or n_instruction == 'all23' or n_instruction == 'all24' or n_instruction == 'all25':
             print('all2x rule hit')
-            if n == 'all21':
+            if n_instruction == 'all21':
                 if call1pc == 'n':
                     print('21 not closed, fixing')
                     return userstatus, '3'
                 else:
                     print('21 closed')
                     return userstatus, '5'
-            if n == 'all22':
+            if n_instruction == 'all22':
                 if call2pc == 'n':
                     print('22 not closed, fixing')
                     return userstatus, '3'
                 else:
                     print('22 closed')
                     return userstatus, '5'
-            if n == 'all23':
+            if n_instruction == 'all23':
                 if call3pc == 'n':
                     print('23 not closed, fixing')
                     return userstatus, '3'
                 else:
                     print('23 closed')
                     return userstatus, '5'
-            if n == 'all24':
+            if n_instruction == 'all24':
                 if call4pc == 'n':
                     print('24 not closed, fixing')
                     return userstatus, '3'
                 else:
                     print('24 closed')
                     return userstatus, '5'
-            if n == 'all25':
+            if n_instruction == 'all25':
                 if call5pc == 'n':
                     print('25 not closed, fixing')
                     return userstatus, '3'
@@ -1055,15 +1055,15 @@ async def load_field(userid, n, channel):
         wlratio = ratioFunction(float(tw), float(tl))
         score3 = '{0:.2f}'.format(float(score3))
         score2 = '{0:.2f}'.format(float(score2))
-        footertxt = ' \n \nscore W: 0     score M: 0     total: 0     '  
-        #footertxt = ' \n \nscore W: ' + str(score1) + ' score M: ' + str(score2) + ' total: ' + str(score3) 
-        footertxt = ' \n \nscore: ' + str(score3) + '   W/L: ' + str(wlratio) #+ '**'
+        footertxt = ' \n\nscore W: 0     score M: 0     total: 0     '  
+        #footertxt = ' \n\nscore W: ' + str(score1) + ' score M: ' + str(score2) + ' total: ' + str(score3) 
+        footertxt = ' \n\nscore: ' + str(score3) + '   W/L: ' + str(wlratio) #+ '**'
         sixstring = ' \n*open a new trade with* **.open <TICKER> LONG/SHORT**'
         if int(tw) == 0:
             tw = 0.07
         
-        
         wlratio2 = '-'
+        ##calculate average percentages for win or loss
         avggainpct = int(float(scorewin))
         avglosspct = int(float(scoreloss))
         #sixstring = 'W/L: **' + str(wlratio) + '**   user: ' + '<@!' + str(userid) + '>'
@@ -1094,10 +1094,10 @@ async def load_field(userid, n, channel):
         embed.set_footer(text=footertxt) 
         print('sending')
 
-        if n == 'all' or n == 'all2':
+        if n_instruction == 'all' or n_instruction == 'all2':
             await channel.send(embed=embed)
 
-        if n == 'scan':
+        if n_instruction == 'scan':
             return userstatus, n1, n2, n3, n4, n5, score1, score2, score3
            
     return userstatus
@@ -1108,12 +1108,10 @@ async def load_field(userid, n, channel):
 async def on_ready():
     print('Logged in as', client.user.name)
     print('-ready-')
-
-           
+      
 # async def background_loop():
 #     await client.wait_until_ready()
 #     while not client.is_closed:
-
 #         await asyncio.sleep(30)
 #     return
 
@@ -1138,8 +1136,8 @@ async def on_message(message):
     #check user's balance
     elif rmsg2 == '.BALANCE':
         try:
-            n = 'gibs'
-            score2, lastgibs = await load_field(userid, n, channel)
+            n_instruction = 'gibs'
+            score2, lastgibs = await load_field(userid, n_instruction, channel)
             score2 = '${0:.2f}'.format(float(score2))
             await channel.send(str(score2))
         except Exception as e:
@@ -1149,45 +1147,46 @@ async def on_message(message):
 #check for user's positions
     elif rmsg2 == '.CALLS' or rmsg2.startswith('.CALLS '):
         serverds = time.strftime('%D')
-        n = 'all'
+        n_instruction = 'all'
         print(rmsg2) 
-        #await load_data(userid, n, channel, 'score2')
+        #await load_data(userid, n_instruction, channel, 'score2')
 
         if rmsg2.startswith('.CALLS '):
             print(len(rmsg2))
             if len(str(rmsg2)) > 7:
 
-                n = 'all2'
+                n_instruction = 'all2'
                 inputed = str(rmsg2[7:])
                 inputed = inputed.replace('<', '').replace('@', '').replace('!', '').replace('>', '')
                 try:
                     print('trying to load info for user')
-                    userstatus = await load_field(int(inputed), n, channel)
+                    userstatus = await load_field(int(inputed), n_instruction, channel)
                     print(userstatus)
                 except Exception as e: 
                     print(e)
                     print(inputed)
                     print('error 89 invalid user')
                     return
-        if n == 'all2':
+        if n_instruction == 'all2':
             return
-        n = 'all'
+        n_instruction = 'all'
         try:
-            userstatus = await load_field(authorid, n, channel)
+            userstatus = await load_field(authorid, n_instruction, channel)
         except Exception as e: 
             #firsttimeuser(userid)
             print(e)
             print('exception 432 calls')
             return
+        #if non registered user uses calls command, initiate user
         if userstatus == 0:
-            await firsttimeuser(userid, channel, n)
+            await firsttimeuser(userid, channel, n_instruction)
 #delete position, will close it first if still opened to avoid exploiting
     elif rmsg2.startswith('.DELETE '):
         serverds = time.strftime('%D')
         inputed = rmsg2[8:]
         inform = ''
         params = inputed.split()
-        allowed = ['1', '2', '3', '4', '5']
+        allowed_indicators = ['1', '2', '3', '4', '5']
         num_params = len(params) 
         #ticker = params[0].upper()
         if num_params > 0:
@@ -1195,12 +1194,11 @@ async def on_message(message):
             start_index = 0
             for i in range(start_index, len(params)):
                 indicator = params[i].upper()
-                ## looking for indicators
-
-                if indicator in allowed:
-                    n = 'all2' + str(indicator)
+                ## looking for indicators and options
+                if indicator in allowed_indicators:
+                    n_instruction = 'all2' + str(indicator)
                     try:
-                        userstatus, posstatus = await load_field(authorid, n, channel)
+                        userstatus, posstatus = await load_field(authorid, n_instruction, channel)
                         print('pos status: '+ str(posstatus))
                     except Exception as e: 
                         print(e)
@@ -1210,8 +1208,8 @@ async def on_message(message):
                             print('cheated, might need to add loss')
                             #return
                             #################################
-                            n = 'close' + str(indicator) + 'f'
-                            call, callpo, callpc, calldo, calldc, callpos, score3, score2, tw, tl, scorewin, scoreloss, score1, moneyremember = await load_field(userid, n, channel)
+                            n_instruction = 'close' + str(indicator) + 'f'
+                            call, callpo, callpc, calldo, calldc, callpos, score3, score2, tw, tl, scorewin, scoreloss, score1, moneyremember = await load_field(userid, n_instruction, channel)
                             print(call)                          
                             ticker = call
                             try:
@@ -1224,6 +1222,7 @@ async def on_message(message):
                                 preply = '0'
                             if preply == '0':
                                 try:
+                                    # vantage not used anymore
                                     # vantage_api_step += 1
                                     # price = get_vantage(ticker, vantage_api_step)
                                     # print(price)
@@ -1303,16 +1302,16 @@ async def on_message(message):
                                         print('in loss')
                             #await message.add_reaction('✅')
                             print('adding tw tl')
-                            n = 'ratioupdate'
-                            updatemoney = await money_update(userid, n, channel, score2)
-                            updategainloss = await update_gain_losses(userid, n, channel, scorewin, scoreloss, score1)
-                            updateres = await update_field2delete(userid, n, channel, tw, tl)
+                            n_instruction = 'ratioupdate'
+                            updatemoney = await money_update(userid, n_instruction, channel, score2)
+                            updategainloss = await update_gain_losses(userid, n_instruction, channel, scorewin, scoreloss, score1)
+                            updateres = await update_field2delete(userid, n_instruction, channel, tw, tl)
 
                         else:
                             print('didnt find cheat, proceeding with delete.')
 
                     print('deleting..')
-                    n = 'delete'
+                    n_instruction = 'delete'
                     call = 'n'
                     callpo = 'n'
                     callpc = 'n'
@@ -1322,7 +1321,7 @@ async def on_message(message):
                     
                     print(indicator)
                     await message.add_reaction('✅')
-                    updateres = await update_field(userid, call, callpo, callpc, calldo, calldc, callpos, n, indicator, channel, inform)
+                    updateres = await update_field(userid, call, callpo, callpc, calldo, calldc, callpos, n_instruction, indicator, channel, inform)
                 else:
                     msg = 'indicatorerror'
                     await message.add_reaction('⚠')
@@ -1330,27 +1329,27 @@ async def on_message(message):
                     return
 
         if userstatus == 0:
-            await firsttimeuser(userid, channel, n)
+            await firsttimeuser(userid, channel, n_instruction)
 
 #daily USD tether bonus
     elif rmsg2 == '.GIBS' or rmsg2 == '.GIB' or rmsg2 == '.DAILY':
         if daily_usd_claim != 1:
             return
         serverds = time.strftime('%D')
-        n = 'gibs'
+        n_instruction = 'gibs'
         
         try:
-            userstatus = await load_field(authorid, n, channel)
+            userstatus = await load_field(authorid, n_instruction, channel)
         except Exception as e: 
             #firsttimeuser(userid)
             print(e)
             return
         if userstatus == 0:
-            await firsttimeuser(userid, channel, n)
+            await firsttimeuser(userid, channel, n_instruction)
         
         else:
             #check if already claimed today
-            score2, lastgibs = await load_field(userid, n, channel)   
+            score2, lastgibs = await load_field(userid, n_instruction, channel)   
             if score2 == None:
                 score2 = '0'
             if str(lastgibs) == serverds:
@@ -1362,7 +1361,7 @@ async def on_message(message):
                 #update db with bonus credits for user
                 await message.add_reaction('✅')
                 score2 = float(score2) + daily_usd_amount
-                await update_tether(userid, n, channel, score2)    
+                await update_tether(userid, n_instruction, channel, score2)    
 
 #closing positions/calls
     elif rmsg2.startswith('.CLOSE '):
@@ -1370,7 +1369,7 @@ async def on_message(message):
         userstatus = 0
         inputed = rmsg2[7:]
         params = inputed.split()
-        allowed = ['1', '2', '3', '4', '5']
+        allowed_indicators = ['1', '2', '3', '4', '5']
         num_params = len(params) 
         #ticker = params[0].upper()
         if num_params > 0:
@@ -1379,10 +1378,10 @@ async def on_message(message):
             for i in range(start_index, len(params)):
                 indicator = params[i].upper()
                 ## looking for indicators
-                if indicator in allowed:
-                    n = 'close' + str(indicator)
+                if indicator in allowed_indicators:
+                    n_instruction = 'close' + str(indicator)
                     try:
-                        userstatus, userres = await load_field(authorid, n, channel)
+                        userstatus, userres = await load_field(authorid, n_instruction, channel)
                     except Exception as e: 
                         print(e)
                         print('exception 4')
@@ -1395,8 +1394,8 @@ async def on_message(message):
 
                         if userres == '5':
                             print('closing..')
-                            n = 'close' + str(indicator) + 'f'
-                            call, callpo, callpc, calldo, calldc, callpos, score3, score2, tw, tl, scorewin, scoreloss, score1, moneyremember = await load_field(userid, n, channel)
+                            n_instruction = 'close' + str(indicator) + 'f'
+                            call, callpo, callpc, calldo, calldc, callpos, score3, score2, tw, tl, scorewin, scoreloss, score1, moneyremember = await load_field(userid, n_instruction, channel)
                             ticker = call
                             try:
                                 price = get_shitcoin(ticker)
@@ -1502,8 +1501,8 @@ async def on_message(message):
                                    
                             await message.add_reaction('✅')
                             #score2 = finaltether
-                            updategainloss = await update_gain_losses(userid, n, channel, scorewin, scoreloss, score1)
-                            updateres = await update_field2(userid, callpc, calldc, n, indicator, channel, score3, score2, tw, tl, inform)
+                            updategainloss = await update_gain_losses(userid, n_instruction, channel, scorewin, scoreloss, score1)
+                            updateres = await update_field2(userid, callpc, calldc, n_instruction, indicator, channel, score3, score2, tw, tl, inform)
  
     #open position/call
     elif rmsg2.startswith('.CALL ') or rmsg2.startswith('.OPEN '):
@@ -1514,7 +1513,7 @@ async def on_message(message):
         if vantage_api_step > 9:
             vantage_api_step = 0
         print('dd')
-        allowed = ['SHORT', 'LONG']
+        allowed_indicators = ['SHORT', 'LONG']
         inputed = message.content[6:]
         params = inputed.split()
         num_params = len(params) 
@@ -1530,34 +1529,33 @@ async def on_message(message):
             start_index = 1
             for i in range(start_index, len(params)):
                 indicator = params[i].upper()
-                ## looking for indicators
+                ## looking for indicators and options
        
-                if indicator in allowed:
+                if indicator in allowed_indicators:
                     if indicator == 'SHORT':
                         callpos = indicator
                     if indicator == 'LONG':
                         callpos = indicator
-                if indicator not in allowed:
-                    print('invalid indicator')
+                if indicator not in allowed_indicators:
+                    #print('invalid indicator')
                     await message.add_reaction('⚠')
                     asyncio.ensure_future(notification_handler(userid, channel, 'Error', 'Invalid position', '*open a new trade with* **.open TICKER LONG/SHORT**'))                 
                     return
         try:
-            n = 'call'
-            userstatus = await load_field(authorid, n, channel)
+            n_instruction = 'call'
+            userstatus = await load_field(authorid, n_instruction, channel)
         except Exception as e: 
             print(e)
-            print('exception call push 14')
         if userstatus == 0:
-            n = 'call'
-            print('didnt find user, creating and checking again before call')
-            userstatus = await firsttimeuser(userid, channel, n)
+            n_instruction = 'call'
+            #print('didnt find user, creating and checking again before call')
+            userstatus = await firsttimeuser(userid, channel, n_instruction)
         if userstatus == 3 or userstatus == 1:
-            n = 'scan'
-            userstatus, n1, n2, n3, n4, n5, score1, score2, score3 = await load_field(userid, n, channel)
-            print(str(n1) + str(n2) + str(n3) + str(n4) + str(n5))
-            print('ticker:' + ticker)
-            print('position:' + callpos)
+            n_instruction = 'scan'
+            userstatus, n1, n2, n3, n4, n5, score1, score2, score3 = await load_field(userid, n_instruction, channel)
+            #print(str(n1) + str(n2) + str(n3) + str(n4) + str(n5))
+            #print('ticker:' + ticker)
+            #print('position:' + callpos)
 
             try:
                 price = get_shitcoin(ticker)
@@ -1586,38 +1584,41 @@ async def on_message(message):
 
             price = str(price).replace(',', '')
             price = float(price)
-            n = 'update'
+            n_instruction = 'update'
             try:
                 inform = ''
                 if preply == '00':
                     print('no price')
+                #check for empty slots
                 elif n1 == 0:
                     print('n1')
-                    updateres = await update_field(userid, ticker, price, 'n', serverds, 'n', callpos, n, 1, channel, inform)
-                    remembermoney = await remember_money(userid, n, channel, score2, 1)
+                    updateres = await update_field(userid, ticker, price, 'n', serverds, 'n', callpos, n_instruction, 1, channel, inform)
+                    remembermoney = await remember_money(userid, n_instruction, channel, score2, 1)
                 elif n2 == 0:
-                    updateres = await update_field(userid, ticker, price, 'n', serverds, 'n', callpos, n, 2, channel, inform)
+                    updateres = await update_field(userid, ticker, price, 'n', serverds, 'n', callpos, n_instruction, 2, channel, inform)
                     print('n2')
-                    remembermoney = await remember_money(userid, n, channel, score2, 2)
+                    remembermoney = await remember_money(userid, n_instruction, channel, score2, 2)
                 elif n3 == 0:
-                    updateres = await update_field(userid, ticker, price, 'n', serverds, 'n', callpos, n, 3, channel, inform)
+                    updateres = await update_field(userid, ticker, price, 'n', serverds, 'n', callpos, n_instruction, 3, channel, inform)
                     print('n3')
-                    remembermoney = await remember_money(userid, n, channel, score2, 3)
+                    remembermoney = await remember_money(userid, n_instruction, channel, score2, 3)
                 elif n4 == 0:
-                    updateres = await update_field(userid, ticker, price, 'n', serverds, 'n', callpos, n, 4, channel, inform)
+                    updateres = await update_field(userid, ticker, price, 'n', serverds, 'n', callpos, n_instruction, 4, channel, inform)
                     print('n4')
-                    remembermoney = await remember_money(userid, n, channel, score2, 4)
+                    remembermoney = await remember_money(userid, n_instruction, channel, score2, 4)
                 elif n5 == 0:
-                    updateres = await update_field(userid, ticker, price, 'n', serverds, 'n', callpos, n, 5, channel, inform)
+                    updateres = await update_field(userid, ticker, price, 'n', serverds, 'n', callpos, n_instruction, 5, channel, inform)
                     print('n5')   
-                    remembermoney = await remember_money(userid, n, channel, score2, 5)
+                    remembermoney = await remember_money(userid, n_instruction, channel, score2, 5)
                 else:
-                    print('no empty slots')
+                    #no free slots available, alert user
+                    #print('no empty slots')
                     updateres = 'full'
             except Exception as e: 
                 print(e)
-                print('exception slotcheck')
+                #print('exception slotcheck')
             finally:
+                #alert user if we cant find the ticker
                 if preply == '00':
                     msg = 'noprice'
                     await message.add_reaction('⚠')
@@ -1625,7 +1626,7 @@ async def on_message(message):
                     return
                 print(updateres)
 
-            print('vantage api: ' + str(vantage_api_step)) 
+            #print('vantage api: ' + str(vantage_api_step)) 
 
             if preply == '00':
                 print('cant find ticker')
@@ -1643,22 +1644,17 @@ async def on_message(message):
                     await message.add_reaction('✅')
                     asyncio.ensure_future(notification_handler(userid, channel, 'Success', 'Opened trade.', updatemsg))      
 
-    elif rmsg2 == '.CALLS INIT5315413431431':
-        n = 'all'
+    elif rmsg2 == '.CALLS debugINIT5315413431431':
+        n_instruction = 'all'
         try:
             print('test')
             #firsttimeuser(userid)
         except Exception as e: 
             print(e)
-            print('exception 44')
-        #await channel.send('.') 
-        return        
-
+        return
 def Main():
-    # Log in as bot
 #    client.loop.create_task(background_loop())
-    client.run(discord_token)   
-    
+    client.run(discord_token)
 if __name__ == "__main__":
 
     Main()
