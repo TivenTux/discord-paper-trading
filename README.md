@@ -1,9 +1,12 @@
 ### Discord paper trading bot
 Simple trading game that allows for LONG or SHORT positions on crypto and the stock market.
+
 Please make a discord bot and get its token here: https://discord.com/developers/applications
+
 Vantage or CryptoCompare apis not needed anymore as they have been replaced by pyppeteer and TradingView.
 
 Remember to edit chrome_exec_dir with the location of Google Chrome executable. Chromium works too.
+
 _commands:_
 ```
 .gibs Daily USDT bonus.
