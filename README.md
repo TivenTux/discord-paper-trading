@@ -6,16 +6,16 @@ Please make a discord bot and get its token here: https://discord.com/developers
 Vantage or CryptoCompare apis not needed anymore as they have been replaced by pyppeteer and TradingView.
 
 Remember to edit chrome_exec_dir with the location of Google Chrome executable. Chromium works too.
+
 ![](https://github.com/TivenTux/discord-paper-trading/blob/main/demo.gif)
+
 _commands:_
-```
-.gibs Daily USDT bonus.
+```.gibs Daily USDT bonus.
 .calls View your positions and stats.
 .open <TICKER> LONG/SHORT open a trade
 .close <slotNumber> closes the trade and realizes profits.
 .delete <slotNumber> closes trade and clears slot.
-.calls <USER> View stats of another user
-```
+.calls <USER> View stats of another user```
 
 ### pip install
 ```
