@@ -9,13 +9,14 @@ Remember to edit chrome_exec_dir with the location of Google Chrome executable. 
 
 ![](https://github.com/TivenTux/discord-paper-trading/blob/main/demo.gif)
 
-_commands:_
+_commands:_ 
 ```.gibs Daily USDT bonus.
 .calls View your positions and stats.
 .open <TICKER> LONG/SHORT open a trade
 .close <slotNumber> closes the trade and realizes profits.
 .delete <slotNumber> closes trade and clears slot.
-.calls <USER> View stats of another user```
+.calls <USER> View stats of another user
+```
 
 ### pip install
 ```
