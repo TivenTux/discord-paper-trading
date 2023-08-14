@@ -1,19 +1,28 @@
-import requests, time, os, random, json, re, asyncio, urllib, urllib.request, subprocess, sys
-import discord, sqlite3, pyppeteer
-from discord.ext.commands import Bot
-from discord.ext import commands
+import requests, time, json, asyncio 
+import os
+from os import environ
+import discord, sqlite3
 from pyppeteer import launch
 from pycoingecko import CoinGeckoAPI
 cg = CoinGeckoAPI()
 
 #discord_bot_token
-discord_token = 'xxxxxxxx'
+discord_token = os.environ['discord_token']
 
 client = discord.Client(prefix='', intents=discord.Intents().all())
 
-#daily usd bonus for each player. 1 to enable 2 to disable
+#daily usd bonus for each player. 1 to enable 0 to disable
+#check if ENV vars are set otherwise use defaults
 daily_usd_claim = 1
 daily_usd_amount = 250
+if environ.get('daily_usd_claim') is not None:
+    daily_usd_claim = int(os.environ['daily_usd_claim'])
+else:
+    daily_usd_claim = 1
+if environ.get('daily_usd_amount') is not None:
+    daily_usd_amount = int(os.environ['daily_usd_amount'])
+else:
+    daily_usd_claim = 250
 
 #tv base url
 tvbase = base1symbol = 'https://www.tradingview.com/widgetembed/?frameElementId=tradingview_e1816&symbol='
@@ -29,7 +38,7 @@ chrome_exec_args = ["--proxy-server='direct://'", '--proxy-bypass-list=*', '--us
 database = './calls.db'
 
 #not used anymore - cryptocompare api - replaced by gecko and tv
-crypto_compare_token = 'xxxx'
+crypto_compare_token = os.environ['crypto_compare_token']
 
 ### conf end
 ###
