@@ -36,8 +36,10 @@ chrome_exec_args = ["--proxy-server='direct://'", '--proxy-bypass-list=*', '--us
 database = './data/calls.db'
 
 #not used anymore - cryptocompare api - replaced by gecko and tv
-crypto_compare_token = os.environ['crypto_compare_token']
-
+# if environ.get('crypto_compare_token') is not None:
+#     crypto_compare_token = os.environ['crypto_compare_token']
+# else:
+#     crypto_compare_token = ''
 ### conf end
 #init some stuff
 cg = CoinGeckoAPI()
