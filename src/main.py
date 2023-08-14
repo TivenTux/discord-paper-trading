@@ -12,7 +12,7 @@ from pycoingecko import CoinGeckoAPI
 
 #discord_bot_token
 discord_token = os.environ['discord_token']
-
+#since the commands go through normal message the bot needs to have intents enabled on bot. https://discord.com/developers/applications
 client = discord.Client(prefix='', intents=discord.Intents().all())
 
 #daily usd bonus for each player. 1 to enable 0 to disable
