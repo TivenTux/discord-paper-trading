@@ -31,7 +31,7 @@ else:
 #where chrome executable is located
 chrome_exec_dir = '/usr/bin/google-chrome'
 #browser arguments
-chrome_exec_args = ["--proxy-server='direct://'", '--proxy-bypass-list=*', '--user-data-dir=./tmp']
+chrome_exec_args = ["--proxy-server='direct://'", '--proxy-bypass-list=*', '--user-data-dir=./tmp', '--no-sandbox']
 #main database file location
 database = './src/calls.db'
 
