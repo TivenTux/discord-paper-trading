@@ -48,6 +48,8 @@ print('caching coins list')
 
 #win loss ratio calculation - for user stats
 def ratioFunction(num1, num2):
+    '''
+    Takes number1 and number2, returns w/l ratio.'''
     try:
         if int(num1) >= 1 and int(num2) == 0:
             result = '{0:.2f}'.format(float(num1))
@@ -62,6 +64,9 @@ def ratioFunction(num1, num2):
 
 #calculate percentage
 def get_change(previous, current):
+    '''
+    Takes first and second number, returns the change in percent.
+    '''
     #if current == previous:
     #    return 100.0
     try:
@@ -73,6 +78,9 @@ def get_change(previous, current):
 
 #if all APIs fail, use chrome and scrape tv for price data
 async def tradingview_price(ticker):
+    '''
+    Takes ticker, scrapes tradingview and returns price and price change in percent.
+    '''
     #initiate some values
     result = 'none'  
     resultchange = '-' 
@@ -131,21 +139,24 @@ async def tradingview_price(ticker):
 
 #create db connection
 def create_connection(db_file):
-    """ create a database connection to the SQLite database
+    ''' create a database connection to the SQLite database
         specified by db_file
     :param db_file: database file
     :return: Connection object or None
-    """
+    '''
     conn = None
     try:
         conn = sqlite3.connect(db_file)
-    except Error as e:
+    except Exception as e:
         print(e)
 
     return conn
 
 #use coingecko api for price first
 def get_shitcoin(ticker):
+    '''
+    Takes ticker, returns price.
+    '''
     x = 0
     tickerid = ''
     while x < len(dump1):
@@ -178,6 +189,9 @@ def get_shitcoin(ticker):
 
 #crypto compare api
 def get_shitcoin2(ticker):
+    '''
+    Takes ticker, returns price
+    '''
     url1 = 'https://min-api.cryptocompare.com/data/pricemultifull?fsyms='
     url2 = '&tsyms=BTC,USD&api_key=' + str(crypto_compare_token)
     url = url1 + ticker + url2
@@ -195,6 +209,9 @@ vantage_api_selection = ['xxxxxxxxxx', 'xxxxxxxxxx',
         'xxxxxxxxxx', 'xxxxxxxxxx']
 
 def get_vantage(ticker, vantage_api_step):
+    '''
+    Takes ticker and api_position, returns stock price.
+    '''
     #traditional markets API
     url1 = 'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol='
     url2 = '&apikey='
@@ -212,6 +229,9 @@ def get_vantage(ticker, vantage_api_step):
 async def update_gain_losses(userid, n_instruction, channel, scorewin, scoreloss, score1):
     #updates real gain and losses score
     #on delete and close
+    '''
+    Takes userid, n_instruction, channel, scorewin, scoreloss, score1 and pushes changes to the database.
+    '''
     conn = create_connection(database)
     serverds = time.strftime('%D')
     n_instruction = 'ratioupdate'
@@ -234,6 +254,9 @@ async def update_gain_losses(userid, n_instruction, channel, scorewin, scoreloss
     return str('updated')   
 
 async def nameupdate(userid, n_instruction, channel, usern):
+    '''
+    Takes userid, instruction, channel, username and updates the database.
+    '''
     #updates user name
     #on every loadfield
     conn = create_connection(database)
@@ -249,6 +272,9 @@ async def nameupdate(userid, n_instruction, channel, usern):
     return str('updatedname')     
 
 async def money_update(userid, n_instruction, channel, score2):
+    '''
+    Takes userid, n_instruction, channel, score2 and updates db.
+    '''
     #updates user's money
     #on delete and close
     conn = create_connection(database)
@@ -270,6 +296,9 @@ async def money_update(userid, n_instruction, channel, score2):
 
 async def remember_money(userid, n_instruction, channel, money, multiplier):
     #remembers money amount when each position is opened
+    '''
+    Takes userid, n_instruction, channel, money, multiplier and updates db
+    '''
     conn = create_connection(database)
     serverds = time.strftime('%D')
     try:
@@ -296,6 +325,9 @@ async def remember_money(userid, n_instruction, channel, money, multiplier):
     return str('updated')  
 
 async def load_data(userid, n_instruction, channel, orderby):
+    '''
+    Takes userid, n_instruction, channel, order and loads user data from db
+    '''
     #loads data for users from db
     #also used to check for registered users and existing data
     userstatus = 0
@@ -340,6 +372,9 @@ async def load_data(userid, n_instruction, channel, orderby):
     return
 
 async def update_field2delete(userid, n_instruction, channel, tw, tl):
+    '''
+    Takes userid, n_instruction, channel, totalwin, t1 and updates totalwin and t1 on db
+    '''
     #updates specific position when called
     #usually on closing position
     conn = create_connection(database)
@@ -366,9 +401,6 @@ def create_entry(conn, entry):
     #not used anymore, replaced by initiator
     """
     Create a new entry into the entries table
-    :param conn:
-    :param project:
-    :return: project id
     """
     sql = ''' INSERT INTO calls(userid,call1,call1po,call1pc,call1do,call1dc,call2,call2po,call2pc,call2do,call2dc,call3,call3po,call3pc,call3do,call3dc,call4,call4po,call4pc,call4do,call4dc,call5,call5po,call5pc,call5do,call5dc)
               VALUES(??????????????????????????) '''
@@ -379,6 +411,9 @@ def create_entry(conn, entry):
     return cur.lastrowid
 
 async def update_tether(userid, n_instruction, channel, score2):
+    '''
+    Updates user's usdTether on database
+    '''
     # updates total USD tether credits and last requested gibs day
     conn = create_connection(database)
     serverds = time.strftime('%D')
@@ -403,6 +438,9 @@ async def update_tether(userid, n_instruction, channel, score2):
     return str('updatedgibs')    
 
 async def update_field2(userid, callpc, calldc, n_instruction, multiplier, channel, score3, score2, tw, tl, inform):
+    '''
+    Updates call/position of the user in database.
+    '''
     #updates specific position or multiplier when called
     #usually on closing position
     conn = create_connection(database)
@@ -523,13 +561,10 @@ async def update_field2(userid, callpc, calldc, n_instruction, multiplier, chann
 
 #new user initiator
 def create_entryinitiate(conn, entry, userid, n_instruction):
+    '''
+    Creates a new entry for the user, in the database.
+    '''
     #initiates/registers user that cant be found in db
-    """
-    Create a new entry into the entries table
-    :param conn:
-    :param project:
-    :return: project id
-    """
     try:
         sql = ''' INSERT INTO calls(userid,call1,call1po,call1pc,call1do,call1dc,call2,call2po,call2pc,call2do,call2dc,call3,call3po,call3pc,call3do,call3dc,call4,call4po,call4pc,call4do,call4dc,call5,call5po,call5pc,call5do,call5dc,call1pos,call2pos,call3pos,call4pos,call5pos,score2)
                   VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) '''
@@ -543,6 +578,9 @@ def create_entryinitiate(conn, entry, userid, n_instruction):
 
 #some channel cleanup for bot messages
 async def notification_handler(userid, channel, msgtype, msgname, msgvalue):
+    '''
+    Handles notifications
+    '''
     serverds = time.strftime('%D')
     embed=discord.Embed(title=msgtype, url='')
     embed.set_author(name=" ", url="", icon_url="")
@@ -553,6 +591,9 @@ async def notification_handler(userid, channel, msgtype, msgname, msgvalue):
     return
 
 async def send_message2(userid, channel, msg, inform):
+    '''
+    Handles notifications
+    '''
     #handles most messages and alerts   
     serverds = time.strftime('%D')
     if msg == 'alreadyclosed':
@@ -573,6 +614,9 @@ async def send_message2(userid, channel, msg, inform):
     return
 
 async def send_message(userid, channel, msg):
+    '''
+    Handles notifications
+    '''
     #handles different set of messages and alerts  
     serverds = time.strftime('%D')
     #already closed slot msg
@@ -635,6 +679,9 @@ async def send_message(userid, channel, msg):
     
 ###call, callpo, callpc, calldo, calldc, callpos ====> ticker, call_price_open, call_price_close, calldateopen, calldateclose, callposition
 async def firsttimeuser(userid, channel, n_instruction):
+    '''
+    Saves new user to database.
+    '''
     #initiates/registers user that cant be found in db
     #prepares data and passes it to initiator
     try:
@@ -692,6 +739,9 @@ async def firsttimeuser(userid, channel, n_instruction):
     return
 
 async def update_field(userid, call, callpo, callpc, calldo, calldc, callpos, n_instruction, multiplier, channel, inform):
+    '''
+    Updates calls/positions data in the database.
+    '''
     #updates specific position when called
     #usually on opening new positions
     conn = create_connection(database)
@@ -804,6 +854,9 @@ async def update_field(userid, call, callpo, callpc, calldo, calldc, callpos, n_
     return str('updated')
 
 async def load_field(userid, n_instruction, channel):
+    '''
+    Fetches record data from the database and pushes updates.
+    '''
     #loads data for users from db
     #also used to check for registered users and existing data
     userstatus = 0
@@ -1126,6 +1179,9 @@ async def on_ready():
 
 @client.event  
 async def on_message(message): 
+    '''
+    Checks messages for commands
+    '''
     rmsg = message.content
     global vantage_api_step
     rmsg2 = rmsg.upper()
