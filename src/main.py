@@ -33,7 +33,7 @@ chrome_exec_dir = '/usr/bin/google-chrome'
 #browser arguments
 chrome_exec_args = ["--proxy-server='direct://'", '--proxy-bypass-list=*', '--user-data-dir=./tmp', '--no-sandbox']
 #main database file location
-database = './src/calls.db'
+database = './data/calls.db'
 
 #not used anymore - cryptocompare api - replaced by gecko and tv
 crypto_compare_token = os.environ['crypto_compare_token']
@@ -338,7 +338,7 @@ async def load_data(userid, n_instruction, channel, orderby):
     #also used to check for registered users and existing data
     userstatus = 0
     serverds = time.strftime('%D')
-    connection = sqlite3.connect('./src/calls.db')
+    connection = sqlite3.connect('./data/calls.db')
     cur = connection.cursor()
     usern2 = str((client.get_user(userid)).name)
     try:
