@@ -5,6 +5,8 @@ WORKDIR /discord-paper-trading
 
 COPY requirements.txt .
 COPY ./src ./src
+COPY ./data ./data
+VOLUME /data
 
 RUN pip install -r requirements.txt
 
