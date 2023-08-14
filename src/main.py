@@ -1,10 +1,14 @@
-import requests, time, json, asyncio 
+import requests
+import time
+import json
+import sqlite3
+import asyncio 
 import os
 from os import environ
-import discord, sqlite3
+import discord
 from pyppeteer import launch
 from pycoingecko import CoinGeckoAPI
-cg = CoinGeckoAPI()
+
 
 #discord_bot_token
 discord_token = os.environ['discord_token']
@@ -22,13 +26,7 @@ else:
 if environ.get('daily_usd_amount') is not None:
     daily_usd_amount = int(os.environ['daily_usd_amount'])
 else:
-    daily_usd_claim = 250
-
-#tv base url
-tvbase = base1symbol = 'https://www.tradingview.com/widgetembed/?frameElementId=tradingview_e1816&symbol='
-#these have to be updated on tradingview layout changes
-tv_css_vol = 'div.valueValue-l31H9iuA:nth-child(1)'
-tv_css_closeprice = 'div.valuesWrapper-l31H9iuA > div > div:nth-child(5) > div.valueValue-l31H9iuA'
+    daily_usd_amount = 250
 
 #where chrome executable is located
 chrome_exec_dir = '/usr/bin/google-chrome'
@@ -41,6 +39,14 @@ database = './calls.db'
 crypto_compare_token = os.environ['crypto_compare_token']
 
 ### conf end
+#init some stuff
+cg = CoinGeckoAPI()
+#tv base url
+tvbase = base1symbol = 'https://www.tradingview.com/widgetembed/?frameElementId=tradingview_e1816&symbol='
+#these have to be updated on tradingview layout changes
+tv_css_vol = 'div.valueValue-l31H9iuA:nth-child(1)'
+tv_css_closeprice = 'div.valuesWrapper-l31H9iuA > div > div:nth-child(5) > div.valueValue-l31H9iuA'
+
 ###
 #refreshing coins list
 dump1 = cg.get_coins_list()
