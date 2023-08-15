@@ -6,7 +6,7 @@ Please make a discord bot and get its token here: https://discord.com/developers
 ![](https://github.com/TivenTux/discord-paper-trading/blob/main/demo.gif)
 
 Docker image is available for download on
-**[Dockerhub](https://hub.docker.com/r/docker/tiventux/discord-paper-trading)**.
+**[Dockerhub](https://hub.docker.com/repository/docker/tiventux/discord-paper-trading)**.
 
 ## Environment Variables
 
