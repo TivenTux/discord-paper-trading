@@ -17,7 +17,7 @@ Docker image is available for download on
 You can specify these environment variables when starting the container using the `-e` command-line option as documented
 [here](https://docs.docker.com/engine/reference/run/#env-environment-variables):
 ```bash
-$ docker run -e "discord_token=yyyyyy"
+docker run -e "discord_token=yyyyyy"
 ```
 
 ## Running the pre-built docker image
@@ -31,13 +31,13 @@ docker run --name=discord-paper-trading -d -e "discord_token=yyyyy" tiventux/dis
 
 After having cloned this repository, you can run
 ```bash
-$ docker build -t discord-paper-trading .
+docker build -t discord-paper-trading .
 ```
 
 ## Running the container
 
 ```bash
-$ docker run -d -e "discord_token=yyyyy" discord-paper-trading
+docker run -d -e "discord_token=yyyyy" discord-paper-trading
 
 ```
 
