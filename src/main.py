@@ -131,17 +131,19 @@ async def tradingview_price(ticker):
             titleclose = await page.evaluate('(elementclose) => elementclose.textContent', elementclose)
             print(titleclose)
             result = titleclose
+            await browser.close()
         except Exception as e:
             print(e)
             print('OHLC cant be found')   
-            await browser.close()         
+            await browser.close()  
+            return "error"       
         await asyncio.sleep(0.3)
 
         if load == 2:
-            await browser.close()
+            print('found ohlc data or hit timeout')
+            #await browser.close()
         else:
-            await browser.close()
-            ticker = ticker + 'btc'
+            #await browser.close()
             print('cant find ticker - error')
             
     except Exception as e: 
@@ -193,10 +195,12 @@ def get_shitcoin(ticker):
         shitcoin_price = cg.get_price(ids=tickerid, vs_currencies='usd')[tickerid]['usd']
         if 'e' in str(shitcoin_price):
             shitcoin_price = str("%.17f" % shitcoin_price).rstrip('0').rstrip('.')
+        return str(shitcoin_price)
     except Exception as e:
         print(e)
+        return 'error'
 
-    return str(shitcoin_price)
+    return
 
 
 #crypto compare api
