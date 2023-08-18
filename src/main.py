@@ -39,10 +39,11 @@ chrome_exec_args = ["--proxy-server='direct://'", '--proxy-bypass-list=*', '--us
 database = './data/calls.db'
 
 #not used anymore - cryptocompare api - replaced by gecko and tv
-# if environ.get('crypto_compare_token') is not None:
-#     crypto_compare_token = os.environ['crypto_compare_token']
-# else:
-#     crypto_compare_token = ''
+if environ.get('crypto_compare_token') is not None:
+    crypto_compare_token = os.environ['crypto_compare_token']
+else:
+    crypto_compare_token = 'yyyyyyy'
+
 ### conf end
 #init some stuff
 cg = CoinGeckoAPI()
@@ -211,27 +212,19 @@ def get_shitcoin2(ticker):
     shitcoin_price = json_data2['DISPLAY'][ticker]['USD']['PRICE']
     return str(shitcoin_price)
 
-#vantage not used anymore
-#vantage api keys
-vantage_api_step = 0
-vantage_api_selection = ['xxxxxxxxxx', 'xxxxxxxxxx',
-        'xxxxxxxxxx', 'xxxxxxxxxx', 'xxxxxxxxxx',
-        'xxxxxxxxxx', 'xxxxxxxxxx', 'xxxxxxxxxx',
-        'xxxxxxxxxx', 'xxxxxxxxxx']
-
-def get_vantage(ticker, vantage_api_step):
-    '''
-    Takes ticker and api_position, returns stock price.
-    '''
-    #traditional markets API
-    url1 = 'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol='
-    url2 = '&apikey='
-    api = vantage_api_selection[vantage_api_step]
-    url = url1 + ticker + url2 + api
-    response = requests.get(url)
-    json_data2 = json.loads(response.text)
-    quote = json_data2['Global Quote']['05. price']
-    return str(quote)  
+# def get_vantage(ticker, vantage_api_step):
+#     '''
+#     Takes ticker and api_position, returns stock price.
+#     '''
+#     #traditional markets API
+#     url1 = 'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol='
+#     url2 = '&apikey='
+#     api = vantage_api_selection[vantage_api_step]
+#     url = url1 + ticker + url2 + api
+#     response = requests.get(url)
+#     json_data2 = json.loads(response.text)
+#     quote = json_data2['Global Quote']['05. price']
+#     return str(quote)  
 
 ###
 ###call, callpo, callpc, calldo, calldc, callpos ====> ticker, call_price_open, call_price_close, calldateopen, calldateclose, callposition
