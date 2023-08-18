@@ -11,7 +11,10 @@ from pycoingecko import CoinGeckoAPI
 
 
 #discord_bot_token
-discord_token = os.environ['discord_token']
+if environ.get('discord_token') is not None:
+    discord_token = int(os.environ['discord_token'])
+else:
+    discord_token = 'yyyyyyyyyyyyyy'
 #since the commands go through normal message the bot needs to have intents enabled on bot. https://discord.com/developers/applications
 client = discord.Client(prefix='', intents=discord.Intents().all())
 
