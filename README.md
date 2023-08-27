@@ -19,6 +19,7 @@ You can specify these environment variables when starting the container using th
 ```bash
 docker run -e "discord_token=yyyyyy"
 ```
+_Privileged Gateway Intents will need to be enabled on Bot options on [discord developers panel](https://discord.com/developers/applications) in order for the command messages to work._
 
 ## Running the pre-built docker image
 
